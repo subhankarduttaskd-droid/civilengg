@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CivilEngg - Civil Engineering Tools</title>
+<style>
+:root{--bg:#f5f5f5;--app-bg:#fff;--text:#1a1a1a;--text2:#666;--card-bg:#fff;--card-border:#e8e8e8;--nav-bg:#f0f0f0;--nav-text:#555;--nav-active:#fff;--input-border:#ddd;--result-bg:#f8f9fa;--calc-bg:#1a1a1a;--calc-text:#fff;--header-bg:linear-gradient(135deg,#1e3a5f,#2d5f8a)}
+html.dark{--bg:#111;--app-bg:#1e1e1e;--text:#e0e0e0;--text2:#aaa;--card-bg:#2a2a2a;--card-border:#3a3a3a;--nav-bg:#333;--nav-text:#ccc;--nav-active:#3a3a3a;--input-border:#444;--result-bg:#2a2a2a;--calc-bg:#000;--calc-text:#e0e0e0;--header-bg:linear-gradient(135deg,#2a4a6f,#3d6f9a)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--app-bg);box-shadow:0 0 20px rgba(0,0,0,.08)}
+.header{background:var(--header-bg);color:#fff;padding:20px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700;line-height:1.2}
+.header p{font-size:11px;opacity:.75;margin-top:2px}
+.theme-toggle{display:flex;gap:4px;background:rgba(255,255,255,.15);border-radius:8px;padding:3px}
+.theme-toggle label{font-size:11px;padding:4px 8px;border-radius:6px;cursor:pointer;user-select:none;transition:.2s}
+.theme-toggle input{display:none}
+.theme-toggle label:hover{background:rgba(255,255,255,.25)}
+.theme-toggle input:checked+label{background:#fff;color:#1e3a5f;font-weight:600}
+.content{padding:16px}
+.nav{display:flex;gap:8px;margin-bottom:16px;background:var(--nav-bg);border-radius:12px;padding:4px}
+.nav button{flex:1;border:none;background:transparent;padding:10px 8px;border-radius:9px;font-size:13px;font-weight:600;color:var(--nav-text);cursor:pointer;transition:.2s}
+.nav button.active{background:var(--nav-active);color:#1e3a5f;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.section{display:none}
+.section.active{display:block}
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:700;margin-bottom:12px;color:#1e3a5f;display:flex;align-items:center;gap:8px}
+.subnav{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.subnav button{border:1px solid var(--card-border);background:var(--card-bg);padding:8px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--nav-text);cursor:pointer;transition:.2s}
+.subnav button.active{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.sub-section{display:none}
+.sub-section.active{display:block}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.input-row label{font-size:12px;color:var(--text2);width:70px;flex-shrink:0}
+.input-row input{flex:1;border:1px solid var(--input-border);border-radius:8px;padding:10px;font-size:14px;outline:none;background:var(--card-bg);color:var(--text)}
+.input-row input:focus{border-color:#2d5f8a}
+.unit-select{display:flex;align-items:center;gap:4px}
+.unit-select select{border:1px solid var(--input-border);border-radius:8px;padding:8px 6px;font-size:12px;outline:none;background:var(--card-bg);color:var(--text)}
+.result-box{background:var(--result-bg);border-radius:8px;padding:12px;text-align:center;margin-top:8px}
+.result-box .val{font-size:22px;font-weight:700;color:#1e3a5f}
+.result-box .unit{font-size:12px;color:var(--text2);margin-left:4px}
+.calculator-display{background:var(--calc-bg);border-radius:10px;padding:16px;text-align:right;margin-bottom:10px}
+.calculator-display .expr{font-size:13px;color:var(--text2);min-height:18px;word-break:break-all}
+.calculator-display .current{font-size:28px;font-weight:300;color:var(--calc-text);word-break:break-all}
+.calculator-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.calculator-grid button{border:none;background:var(--nav-bg);padding:16px 0;border-radius:10px;font-size:18px;font-weight:500;color:var(--text);cursor:pointer;transition:.15s}
+.calculator-grid button:hover{background:var(--card-border)}
+.calculator-grid button.op{background:var(--result-bg);color:#2d5f8a;font-weight:600}
+.calculator-grid button.eq{background:#1e3a5f;color:#fff;font-size:20px}
+.calculator-grid button.clear{background:var(--result-bg);color:#c0392b}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{text-align:left;padding:8px 6px;border-bottom:2px solid var(--card-border);color:var(--text2);font-weight:600}
+.table td{padding:8px 6px;border-bottom:1px solid var(--card-border);color:var(--text)}
+.table tr:hover{background:var(--result-bg)}
+.footer{text-align:center;padding:16px;font-size:11px;color:var(--text2)}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header">
+<div class="logo">🏗️</div>
+<div>
+<h1>CivilEngg</h1>
+<p>Civil Engineering Daily Tools</p>
+</div>
+<div class="theme-toggle">
+<label for="theme-light">☀️</label>
+<input type="radio" name="theme" id="theme-light" value="light" checked>
+<label for="theme-dark">🌙</label>
+<input type="radio" name="theme" id="theme-dark" value="dark">
+</div>
+</div>
+<div class="content"><!-- Main Navigation -->
+<nav class="nav">
+<button class="active" data-section="calc">🧮 Calculator</button>
+<button data-section="convert">📏 Converter</button>
+<button data-section="dataset">📋 Dataset</button>
+</nav>
+
+<!-- Calculator Section -->
+<div class="section active" id="section-calc">
+<div class="card">
+<div class="calculator-display">
+<div class="expr" id="calc-expr"></div>
+<div class="current" id="calc-current">0</div>
+</div>
+<div class="calculator-grid">
+<button class="clear" data-action="clear">C</button>
+<button data-action="backspace">⌫</button>
+<button class="op" data-action="div">÷</button>
+<button data-action="mul">×</button>
+<button data-num="7">7</button>
+<button data-num="8">8</button>
+<button data-num="9">9</button>
+<button class="op" data-action="sub">−</button>
+<button data-num="4">4</button>
+<button data-num="5">5</button>
+<button data-num="6">6</button>
+<button class="op" data-action="add">+</button>
+<button data-num="1">1</button>
+<button data-num="2">2</button>
+<button data-num="3">3</button>
+<button class="eq" data-action="eq">=</button>
+<button data-num="0">0</button>
+<button data-num=".">.</button>
+</div>
+</div>
+</div>
+
+<!-- Converter Section -->
+<div class="section" id="section-convert">
+<div class="subnav">
+<button class="active" data-sub="length">Length</button>
+<button data-sub="area">Area</button>
+<button data-sub="volume">Volume</button>
+</div>
+
+<!-- Length Sub-section -->
+<div class="sub-section active" id="sub-length">
+<div class="card">
+<h3>📏 Length Converter</h3>
+<div class="input-row">
+<label>Value</label>
+<input type="number" id="len-value" placeholder="0" step="any">
+</div>
+<div class="input-row">
+<label>From</label>
+<div class="unit-select">
+<select id="len-from">
+<option value="mm">mm</option>
+<option value="cm" selected>cm</option>
+<option value="m">m</option>
+<option value="km">km</option>
+<option value="inch">inch</option>
+<option value="ft">ft</option>
+</select>
+</div>
+</div>
+<div class="input-row">
+<label>To</label>
+<div class="unit-select">
+<select id="len-to">
+<option value="mm">mm</option>
+<option value="cm">cm</option>
+<option value="m" selected>m</option>
+<option value="km">km</option>
+<option value="inch">inch</option>
+<option value="ft">ft</option>
+</select>
+</div>
+</div>
+<div class="result-box">
+<div class="val" id="len-result">0</div>
+<div class="unit" id="len-result-unit">m</div>
+</div>
+</div>
+</div>
+
+<!-- Area Sub-section -->
+<div class="sub-section" id="sub-area">
+<div class="card">
+<h3>📐 Area Converter</h3>
+<div class="input-row">
+<label>Value</label>
+<input type="number" id="area-value" placeholder="0" step="any">
+</div>
+<div class="input-row">
+<label>From</label>
+<div class="unit-select">
+<select id="area-from">
+<option value="m2" selected>m²</option>
+<option value="km2">km²</option>
+<option value="cm2">cm²</option>
+<option value="mm2">mm²</option>
+<option value="acre">acre</option>
+<option value="ha">hectare</option>
+</select>
+</div>
+</div>
+<div class="input-row">
+<label>To</label>
+<div class="unit-select">
+<select id="area-to">
+<option value="m2" selected>m²</option>
+<option value="km2">km²</option>
+<option value="cm2">cm²</option>
+<option value="mm2">mm²</option>
+<option value="acre">acre</option>
+<option value="ha">hectare</option>
+</select>
+</div>
+</div>
+<div class="result-box">
+<div class="val" id="area-result">0</div>
+<div class="unit" id="area-result-unit">m²</div>
+</div>
+</div>
+</div>
+
+<!-- Volume Sub-section -->
+<div class="sub-section" id="sub-volume">
+<div class="card">
+<h3>📦 Volume Converter</h3>
+<div class="input-row">
+<label>Value</label>
+<input type="number" id="vol-value" placeholder="0" step="any">
+</div>
+<div class="input-row">
+<label>From</label>
+<div class="unit-select">
+<select id="vol-from">
+<option value="m3" selected>m³</option>
+<option value="cm3">cm³</option>
+<option value="L">Liter</option>
+<option value="mL">mL</option>
+<option value="ft3">ft³</option>
+<option value="gal">Gallon</option>
+</select>
+</div>
+</div>
+<div class="input-row">
+<label>To</label>
+<div class="unit-select">
+<select id="vol-to">
+<option value="m3" selected>m³</option>
+<option value="cm3">cm³</option>
+<option value="L">Liter</option>
+<option value="mL">mL</option>
+<option value="ft3">ft³</option>
+<option value="gal">Gallon</option>
+</select>
+</div>
+</div>
+<div class="result-box">
+<div class="val" id="vol-result">0</div>
+<div class="unit" id="vol-result-unit">m³</div>
+</div>
+</div>
+</div>
+</div><!-- Dataset Section -->
+<div class="section" id="section-dataset">
+<div class="card">
+<h3>🔍 Filter Materials</h3>
+<input type="text" id="search-mat" placeholder="Search material..." style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:14px;outline:none;margin-bottom:12px">
+</div>
+<div class="card" style="padding:0;overflow:hidden">
+<table class="table" id="material-table">
+<thead>
+<tr><th>Material</th><th>Density</th><th>Unit</th></tr>
+</thead>
+<tbody>
+<tr><td>Sand (Dry)</td><td>1.6</td><td>t/m³</td></tr>
+<tr><td>Sand (Wet)</td><td>1.8</td><td>t/m³</td></tr>
+<tr><td>Gravel</td><td>1.6 - 1.9</td><td>t/m³</td></tr>
+<tr><td>Crushed Stone</td><td>1.6</td><td>t/m³</td></tr>
+<tr><td>Rock (Solid)</td><td>2.6 - 2.8</td><td>t/m³</td></tr>
+<tr><td>Portland Cement</td><td>3.1</td><td>t/m³</td></tr>
+<tr><td>Concrete</td><td>2.4</td><td>t/m³</td></tr>
+<tr><td>Concrete (Reinf.)</td><td>2.5</td><td>t/m³</td></tr>
+<tr><td>Steel</td><td>7.85</td><td>t/m³</td></tr>
+<tr><td>Aluminum</td><td>2.7</td><td>t/m³</td></tr>
+<tr><td>Asphalt</td><td>2.3</td><td>t/m³</td></tr>
+<tr><td>Brick</td><td>1.6 - 2.0</td><td>t/m³</td></tr>
+<tr><td>Wood (Oak)</td><td>0.6 - 0.7</td><td>t/m³</td></tr>
+<tr><td>Soil (Loose)</td><td>1.2 - 1.4</td><td>t/m³</td></tr>
+<tr><td>Soil (Dense)</td><td>1.6 - 1.8</td><td>t/m³</td></tr>
+<tr><td>Clay</td><td>1.5 - 1.8</td><td>t/m³</td></tr>
+<tr><td>Limestone</td><td>2.5 - 2.7</td><td>t/m³</td></tr>
+<tr><td>Granite</td><td>2.6 - 2.8</td><td>t/m³</td></tr>
+<tr><td>Water</td><td>1.0</td><td>t/m³</td></tr>
+<tr><td>Bitumen</td><td>1.0 - 1.2</td><td>t/m³</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="footer">
+CivilEngg &mdash; Built for Civil Engineers
+</div>
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.nav button').forEach(btn => {
+btn.addEventListener('click', () => {
+document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+const section = btn.dataset.section;
+document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+document.getElementById('section-' + section).classList.add('active');
+if (section === 'convert') {
+document.getElementById('sub-length').classList.add('active');
+}
+});
+});
+
+// Converter sub-navigation
+document.querySelectorAll('.subnav button').forEach(btn => {
+btn.addEventListener('click', () => {
+document.querySelectorAll('.subnav button').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+const sub = btn.dataset.sub;
+document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
+document.getElementById('sub-' + sub).classList.add('active');
+});
+});
+
+// Calculator
+let calcCurrent = '0';
+let calcPrev = '';
+let calcOp = null;
+let calcReset = false;
+
+function updateCalcDisplay() {
+document.getElementById('calc-current').textContent = calcCurrent;
+document.getElementById('calc-expr').textContent = calcPrev + (calcOp ? ' ' + calcOp : '');
+}
+
+document.querySelectorAll('.calculator-grid button').forEach(btn => {
+btn.addEventListener('click', () => {
+const action = btn.dataset.action;
+const num = btn.dataset.num;
+
+if (num !== undefined) {
+if (calcReset) { calcCurrent = '0'; calcReset = false; }
+if (calcCurrent === '0' && num !== '.') {
+calcCurrent = num;
+} else if (num === '.' && calcCurrent.includes('.')) {
+return;
+} else {
+calcCurrent += num;
+}
+} else if (action === 'clear') {
+calcCurrent = '0';
+calcPrev = '';
+calcOp = null;
+} else if (action === 'backspace') {
+if (calcCurrent.length > 1) {
+calcCurrent = calcCurrent.slice(0, -1);
+} else {
+calcCurrent = '0';
+}
+} else if (action === 'eq') {
+if (calcOp && calcPrev) {
+const a = parseFloat(calcPrev);
+const b = parseFloat(calcCurrent);
+let result;
+switch(calcOp) {
+case '+': result = a + b; break;
+case '-': result = a - b; break;
+case '×': result = a * b; break;
+case '÷': result = b !== 0 ? a / b : 0; break;
+}
+calcCurrent = String(result);
+calcPrev = '';
+calcOp = null;
+calcReset = true;
+}
+} else {
+// Operator
+if (calcOp && calcPrev && !calcReset) {
+const a = parseFloat(calcPrev);
+const b = parseFloat(calcCurrent);
+let result;
+switch(calcOp) {
+case '+': result = a + b; break;
+case '-': result = a - b; break;
+case '×': result = a * b; break;
+case '÷': result = b !== 0 ? a / b : 0; break;
+}
+calcCurrent = String(result);
+}
+calcPrev = calcCurrent;
+calcOp = action === 'add' ? '+' :
+action === 'sub' ? '-' :
+action === 'mul' ? '×' :
+action === 'div' ? '÷' : null;
+calcReset = true;
+}
+updateCalcDisplay();
+});
+});
+updateCalcDisplay();
+</script>
+<script>
+// Length conversion factors to meters
+const lenToMeter = {
+'mm': 0.001, 'cm': 0.01, 'm': 1, 'km': 1000,
+'inch': 0.0254, 'ft': 0.3048
+};
+const lenUnits = ['mm','cm','m','km','inch','ft'];
+const lenLabels = {mm:'mm',cm:'cm',m:'m',km:'km',inch:'inch',ft:'ft'};
+
+function convertLength() {
+const val = parseFloat(document.getElementById('len-value').value) || 0;
+const from = document.getElementById('len-from').value;
+const to = document.getElementById('len-to').value;
+const meters = val * lenToMeter[from];
+const result = meters / lenToMeter[to];
+document.getElementById('len-result').textContent = result.toFixed(4).replace(/\.?0+$/,'');
+document.getElementById('len-result-unit').textContent = lenLabels[to];
+}
+
+['len-value','len-from','len-to'].forEach(id => {
+document.getElementById(id).addEventListener('input', convertLength);
+document.getElementById(id).addEventListener('change', convertLength);
+});
+
+// Area conversion factors to m²
+const areaToM2 = {
+'m2': 1, 'km2': 1000000, 'cm2': 0.0001, 'mm2': 0.000001,
+'acre': 4046.86, 'ha': 10000
+};
+const areaLabels = {m2:'m²',km2:'km²',cm2:'cm²',mm2:'mm²',acre:'acre',ha:'hectare'};
+
+function convertArea() {
+const val = parseFloat(document.getElementById('area-value').value) || 0;
+const from = document.getElementById('area-from').value;
+const to = document.getElementById('area-to').value;
+const m2 = val * areaToM2[from];
+const result = m2 / areaToM2[to];
+document.getElementById('area-result').textContent = result.toFixed(4).replace(/\.?0+$/,'');
+document.getElementById('area-result-unit').textContent = areaLabels[to];
+}
+
+['area-value','area-from','area-to'].forEach(id => {
+document.getElementById(id).addEventListener('input', convertArea);
+document.getElementById(id).addEventListener('change', convertArea);
+});
+
+// Volume conversion factors to m³
+const volToM3 = {
+'m3': 1, 'cm3': 0.000001, 'L': 0.001, 'mL': 0.000001,
+'ft3': 0.0283168, 'gal': 0.00378541
+};
+const volLabels = {m3:'m³',cm3:'cm³',L:'Liter',mL:'mL',ft3:'ft³',gal:'Gallon'};
+
+function convertVolume() {
+const val = parseFloat(document.getElementById('vol-value').value) || 0;
+const from = document.getElementById('vol-from').value;
+const to = document.getElementById('vol-to').value;
+const m3 = val * volToM3[from];
+const result = m3 / volToM3[to];
+document.getElementById('vol-result').textContent = result.toFixed(4).replace(/\.?0+$/,'');
+document.getElementById('vol-result-unit').textContent = volLabels[to];
+}
+
+['vol-value','vol-from','vol-to'].forEach(id => {
+document.getElementById(id).addEventListener('input', convertVolume);
+document.getElementById(id).addEventListener('change', convertVolume);
+});
+
+// Material search
+document.getElementById('search-mat').addEventListener('input', function() {
+const q = this.value.toLowerCase();
+document.querySelectorAll('#material-table tbody tr').forEach(row => {
+const text = row.textContent.toLowerCase();
+row.style.display = text.includes(q) ? '' : 'none';
+});
+});
+
+// Theme toggle
+const themeLight = document.getElementById('theme-light');
+const themeDark = document.getElementById('theme-dark');
+function applyTheme(theme) {
+if (theme === 'dark') {
+document.documentElement.classList.add('dark');
+themeDark.checked = true;
+themeLight.checked = false;
+} else {
+document.documentElement.classList.remove('dark');
+themeLight.checked = true;
+themeDark.checked = false;
+}
+localStorage.setItem('civilengg-theme', theme);
+}
+themeLight.addEventListener('change', () => applyTheme('light'));
+themeDark.addEventListener('change', () => applyTheme('dark'));
+const saved = localStorage.getItem('civilengg-theme');
+if (saved) applyTheme(saved);
+</script>
+</body>
+</html>
